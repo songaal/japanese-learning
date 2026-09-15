@@ -87,9 +87,11 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 /* ── CHOICES (6-button 3×2 grid) ── */
 .choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
 .cho-btn{padding:14px 4px;border:2px solid var(--cream-d);border-radius:10px;background:var(--white);font-size:1.15rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:700;transition:all .15s;box-shadow:0 3px 0 var(--cream-d);color:var(--dark);text-align:center}
-.cho-btn:hover:not(:disabled){border-color:var(--red);background:#FFF5F5;transform:translateY(-2px);box-shadow:0 5px 0 var(--cream-d)}
+@media(hover:hover){.cho-btn:hover:not(:disabled){border-color:var(--red);background:#FFF5F5;transform:translateY(-2px);box-shadow:0 5px 0 var(--cream-d)}}
 .cho-btn:active:not(:disabled){transform:translateY(1px);box-shadow:0 2px 0 var(--cream-d)}
-.cho-btn:focus{outline:none}
+.cho-btn{-webkit-tap-highlight-color:transparent}
+.cho-btn:focus,.cho-btn:focus-visible{outline:none}
+.cho-btn:focus:not(.wrong):not(.correct){border-color:var(--cream-d);background:var(--white);color:var(--dark);box-shadow:0 3px 0 var(--cream-d)}
 .cho-btn.wrong{border-color:var(--red-l)!important;background:#FDEDEC!important;color:var(--red-l)!important;box-shadow:0 3px 0 var(--red-d)!important}
 .cho-btn.correct{border-color:var(--green)!important;background:#EAFAF1!important;color:var(--green)!important}
 .cho-btn:disabled{cursor:default}
@@ -140,7 +142,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="hdr">
     <h1>ひらがな 학습</h1>
     <p>히라가나 오십음도 마스터</p>
-    <p class="version">v1.0.0 · 2026.09.15</p>
+    <p class="version">v1.0.0 · 2026.09.15 16.38</p>
   </div>
   <div class="divider"><span>❖</span></div>
 
@@ -403,6 +405,7 @@ function elapsed(){return(Date.now()-startMs-totalPausedMs)/1000}
 
 function nextQ() {
   if(over) return;
+  document.activeElement?.blur();
   qNum++; cur=nextChar(); tries=0;
   const ch=mkChoices(cur);
   document.getElementById('main-char').textContent=cur.c;
@@ -410,12 +413,14 @@ function nextQ() {
   BTN_IDS.forEach((id,i)=>{
     const b=document.getElementById(id);
     b.textContent=ch[i]; b.dataset.r=ch[i];
-    b.className='cho-btn'; b.disabled=false; b.blur();
+    b.className='cho-btn'; b.disabled=false;
   });
+  requestAnimationFrame(()=>BTN_IDS.forEach(id=>document.getElementById(id).blur()));
 }
 
 function answer(btn, r) {
   if(over||paused) return;
+  btn.blur();
   tries++;
   if(r===cur.r) {
     const p=tries===1?3:tries===2?2:1;
