@@ -14,6 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
 :root{
   --red:#C0392B;--red-l:#E74C3C;--red-d:#922B21;
   --cream:#FAF6ED;--cream-d:#EDE4D0;
@@ -21,27 +22,27 @@
   --gold:#C9A84C;--gray:#9B8773;
   --white:#FFF;--green:#27AE60;
 }
-body{font-family:'Noto Sans KR','맑은 고딕',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR','맑은 고딕',sans-serif;background:var(--cream);color:var(--dark);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--cream-d) 1px,transparent 1px);background-size:28px 28px;opacity:.45;pointer-events:none;z-index:0}
 
-.screen{position:relative;z-index:1;min-height:100vh;padding:16px;max-width:580px;margin:0 auto}
+.screen{position:relative;z-index:1;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:none;padding:16px;max-width:580px;margin:0 auto}
 [hidden]{display:none!important}
 
 /* ── HEADER ── */
-.hdr{text-align:center;padding:24px 0 14px;position:relative}
+.hdr{text-align:center;padding:16px 0 10px;position:relative}
 .hdr::before,.hdr::after{content:'✿';color:var(--red);font-size:1.1rem;position:absolute;top:50%;transform:translateY(-50%)}
 .hdr::before{left:10px}.hdr::after{right:10px}
 .hdr h1{font-family:'Noto Serif JP',serif;font-size:1.9rem;color:var(--red);letter-spacing:.05em;text-shadow:2px 2px 0 var(--cream-d)}
 .hdr p{font-size:.8rem;color:var(--gray);margin-top:4px;letter-spacing:.1em}
-.version{font-size:.7rem;color:var(--gray);opacity:.65;margin-top:5px;letter-spacing:.05em}
+.version{font-size:.7rem;color:var(--gray);opacity:.65;letter-spacing:.05em;text-align:center;padding:10px 0 18px}
 
 /* ── DIVIDER ── */
-.divider{display:flex;align-items:center;gap:8px;margin:14px 0}
+.divider{display:flex;align-items:center;gap:8px;margin:10px 0}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent)}
 .divider span{color:var(--gold);font-size:.9rem}
 
 /* ── SETTING CARD ── */
-.card{background:var(--white);border:2px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:4px 4px 0 var(--cream-d)}
+.card{background:var(--white);border:2px solid var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:4px 4px 0 var(--cream-d)}
 .card-title{font-family:'Noto Serif JP',serif;font-size:.9rem;color:var(--red-d);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .card-title::before{content:'◆';font-size:.65rem;color:var(--red)}
 
@@ -60,13 +61,13 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .dur-btn.on{border-color:var(--red);background:var(--red);color:var(--white)}
 
 /* ── START BUTTON ── */
-.start-btn{width:100%;padding:16px;background:var(--red);color:var(--white);border:none;border-radius:12px;font-size:1.25rem;font-family:'Noto Serif JP',serif;cursor:pointer;letter-spacing:.1em;box-shadow:0 4px 0 var(--red-d);transition:all .15s;margin-bottom:20px;display:block}
+.start-btn{width:100%;padding:13px;background:var(--red);color:var(--white);border:none;border-radius:12px;font-size:1.2rem;font-family:'Noto Serif JP',serif;cursor:pointer;letter-spacing:.1em;box-shadow:0 4px 0 var(--red-d);transition:all .15s;margin-bottom:10px;display:block}
 .start-btn:hover{background:var(--red-l);transform:translateY(-2px);box-shadow:0 6px 0 var(--red-d)}
 .start-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--red-d)}
 
 /* ── HISTORY ── */
 .hist-empty{text-align:center;color:var(--gray);font-size:.85rem;padding:16px}
-.hist-list{list-style:none;max-height:280px;overflow-y:auto}
+.hist-list{list-style:none;max-height:150px;overflow-y:auto}
 .hist-list::-webkit-scrollbar{width:4px}
 .hist-list::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 .hist-item{padding:9px 10px;border-bottom:1px solid var(--cream-d);display:grid;grid-template-columns:1fr auto;gap:2px;font-size:.82rem}
@@ -149,7 +150,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="hdr">
     <h1>ひらがな 학습</h1>
     <p>히라가나 오십음도 마스터</p>
-    <p class="version">v1.0.0 · 2026.09.15 16:38</p>
   </div>
   <div class="divider"><span>❖</span></div>
 
@@ -170,9 +170,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <button class="dur-btn" data-min="5">5분</button>
       <button class="dur-btn" data-min="7">7분</button>
       <button class="dur-btn" data-min="10">10분</button>
-      <button class="dur-btn" data-min="15">15분</button>
-      <button class="dur-btn" data-min="20">20분</button>
-      <button class="dur-btn" data-min="30">30분</button>
     </div>
   </div>
 
@@ -182,6 +179,8 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <div class="card-title">📋 최근 연습 기록</div>
     <div id="hist-wrap"><div class="hist-empty">아직 연습 기록이 없습니다.</div></div>
   </div>
+
+  <p class="version">v1.0.0 · 2026.09.15 16:38</p>
 </div>
 
 <!-- ── GAME SCREEN ── -->
