@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD166"/>
+      <stop offset="35%" stop-color="#FF6B6B"/>
+      <stop offset="70%" stop-color="#EE4266"/>
+      <stop offset="100%" stop-color="#A020A0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="40%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="tshadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#7B0040" flood-opacity="0.45"/>
+    </filter>
+    <filter id="sparkle">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Base rounded rect -->
+  <rect width="512" height="512" rx="108" ry="108" fill="url(#bg)"/>
+
+  <!-- Inner glow overlay -->
+  <rect width="512" height="512" rx="108" ry="108" fill="url(#glow)"/>
+
+  <!-- Decorative ring -->
+  <circle cx="256" cy="256" r="218" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="3"/>
+  <circle cx="256" cy="256" r="206" fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="6"/>
+
+  <!-- Main hiragana あ -->
+  <text x="256" y="336" font-family="'Noto Serif JP','Yu Mincho','Hiragino Mincho ProN',serif"
+        font-size="290" font-weight="900" text-anchor="middle"
+        fill="#FFFFFF" filter="url(#tshadow)" letter-spacing="-4">あ</text>
+
+  <!-- Star sparkles -->
+  <!-- top-right -->
+  <g transform="translate(388,92)" fill="#FFD166" filter="url(#sparkle)">
+    <polygon points="0,-14 3,-5 12,-5 5,1 8,11 0,5 -8,11 -5,1 -12,-5 -3,-5" opacity="0.92"/>
+  </g>
+  <!-- top-left -->
+  <g transform="translate(130,118)" fill="#FFD166" filter="url(#sparkle)">
+    <polygon points="0,-10 2.4,-3.6 9,-3.6 3.6,0.8 5.8,7.6 0,3.8 -5.8,7.6 -3.6,0.8 -9,-3.6 -2.4,-3.6" opacity="0.80"/>
+  </g>
+  <!-- bottom-left -->
+  <g transform="translate(104,390)" fill="#FFFFFF" filter="url(#sparkle)">
+    <polygon points="0,-8 1.9,-2.9 7.2,-2.9 2.9,0.6 4.6,6.1 0,3 -4.6,6.1 -2.9,0.6 -7.2,-2.9 -1.9,-2.9" opacity="0.65"/>
+  </g>
+  <!-- bottom-right -->
+  <g transform="translate(400,372)" fill="#FFE8A0" filter="url(#sparkle)">
+    <polygon points="0,-11 2.6,-4 10,-4 4,0.9 6.4,8.4 0,4.2 -6.4,8.4 -4,0.9 -10,-4 -2.6,-4" opacity="0.78"/>
+  </g>
+  <!-- tiny top-center -->
+  <g transform="translate(332,68)" fill="#FFFFFF">
+    <circle r="4" opacity="0.70"/>
+  </g>
+  <g transform="translate(178,76)" fill="#FFD166">
+    <circle r="3" opacity="0.60"/>
+  </g>
+  <g transform="translate(440,260)" fill="#FFFFFF">
+    <circle r="3.5" opacity="0.55"/>
+  </g>
+  <g transform="translate(72,240)" fill="#FFD166">
+    <circle r="3" opacity="0.55"/>
+  </g>
+
+  <!-- Cherry blossom petals - top right area -->
+  <g transform="translate(358,148) rotate(18)" opacity="0.75">
+    <ellipse cx="0" cy="-11" rx="6" ry="9" fill="#FFDDE8"/>
+    <ellipse cx="10" cy="-4" rx="6" ry="9" fill="#FFDDE8" transform="rotate(72)"/>
+    <ellipse cx="7" cy="9" rx="6" ry="9" fill="#FFDDE8" transform="rotate(144)"/>
+    <ellipse cx="-7" cy="9" rx="6" ry="9" fill="#FFDDE8" transform="rotate(216)"/>
+    <ellipse cx="-10" cy="-4" rx="6" ry="9" fill="#FFDDE8" transform="rotate(288)"/>
+    <circle r="4" fill="#FFD166"/>
+  </g>
+  <!-- Cherry blossom - bottom left -->
+  <g transform="translate(148,374) rotate(-22)" opacity="0.65">
+    <ellipse cx="0" cy="-8" rx="4.5" ry="6.5" fill="#FFC1D9"/>
+    <ellipse cx="7.8" cy="-2.5" rx="4.5" ry="6.5" fill="#FFC1D9" transform="rotate(72)"/>
+    <ellipse cx="4.8" cy="6.6" rx="4.5" ry="6.5" fill="#FFC1D9" transform="rotate(144)"/>
+    <ellipse cx="-4.8" cy="6.6" rx="4.5" ry="6.5" fill="#FFC1D9" transform="rotate(216)"/>
+    <ellipse cx="-7.8" cy="-2.5" rx="4.5" ry="6.5" fill="#FFC1D9" transform="rotate(288)"/>
+    <circle r="3" fill="#FFAA44"/>
+  </g>
+</svg>
