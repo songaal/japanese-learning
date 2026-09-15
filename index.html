@@ -26,6 +26,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .hdr::before{left:10px}.hdr::after{right:10px}
 .hdr h1{font-family:'Noto Serif JP',serif;font-size:1.9rem;color:var(--red);letter-spacing:.05em;text-shadow:2px 2px 0 var(--cream-d)}
 .hdr p{font-size:.8rem;color:var(--gray);margin-top:4px;letter-spacing:.1em}
+.version{font-size:.7rem;color:var(--gray);opacity:.65;margin-top:5px;letter-spacing:.05em}
 
 /* ── DIVIDER ── */
 .divider{display:flex;align-items:center;gap:8px;margin:14px 0}
@@ -70,7 +71,6 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 
 /* ── GAME HUD ── */
 .hud{display:flex;justify-content:space-between;align-items:center;padding:12px 0 8px}
-.hud-score-wrap{}
 .hud-score-lbl{font-size:.68rem;color:var(--gray);display:block}
 .hud-score{font-family:'Noto Serif JP',serif;font-size:1.6rem;color:var(--red);display:block;line-height:1}
 .hud-timer{font-size:1.9rem;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums;letter-spacing:.05em}
@@ -79,14 +79,14 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .hud-qnum{font-size:.78rem;color:var(--gray);text-align:right}
 
 /* ── CHAR DISPLAY ── */
-.char-box{background:var(--white);border:3px solid var(--red);border-radius:14px;padding:36px 16px;text-align:center;margin-bottom:20px;box-shadow:6px 6px 0 var(--cream-d),inset 0 0 0 2px var(--cream-d);position:relative;overflow:hidden}
+.char-box{background:var(--white);border:3px solid var(--red);border-radius:14px;padding:28px 16px;text-align:center;margin-bottom:16px;box-shadow:6px 6px 0 var(--cream-d),inset 0 0 0 2px var(--cream-d);position:relative;overflow:hidden}
 .char-box::before{content:'';position:absolute;top:-18px;right:-18px;width:72px;height:72px;border-radius:50%;border:3px solid var(--gold);opacity:.25}
 .char-box::after{content:'';position:absolute;bottom:-16px;left:-16px;width:56px;height:56px;border-radius:50%;border:3px solid var(--gold);opacity:.25}
-.main-char{font-family:'Noto Serif JP',serif;font-size:7rem;line-height:1;color:var(--dark);font-weight:900;display:block;user-select:none}
+.main-char{font-family:'Noto Serif JP',serif;font-size:6rem;line-height:1;color:var(--dark);font-weight:900;display:block;user-select:none}
 
-/* ── CHOICES ── */
-.choices{display:flex;gap:10px;margin-bottom:22px}
-.cho-btn{flex:1;padding:18px 8px;border:2px solid var(--cream-d);border-radius:10px;background:var(--white);font-size:1.3rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:700;transition:all .15s;box-shadow:0 3px 0 var(--cream-d);color:var(--dark)}
+/* ── CHOICES (6-button 3×2 grid) ── */
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.cho-btn{padding:14px 4px;border:2px solid var(--cream-d);border-radius:10px;background:var(--white);font-size:1.15rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:700;transition:all .15s;box-shadow:0 3px 0 var(--cream-d);color:var(--dark);text-align:center}
 .cho-btn:hover:not(:disabled){border-color:var(--red);background:#FFF5F5;transform:translateY(-2px);box-shadow:0 5px 0 var(--cream-d)}
 .cho-btn:active:not(:disabled){transform:translateY(1px);box-shadow:0 2px 0 var(--cream-d)}
 .cho-btn:focus{outline:none}
@@ -129,7 +129,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .score-flash{animation:scoreFlash .4s ease-out}
 
 /* ── POINTS POP ── */
-.pts-pop{position:fixed;font-size:1.6rem;font-weight:900;color:var(--gold);pointer-events:none;z-index:200;font-family:'Noto Serif JP',serif;text-shadow:1px 1px 0 var(--dark);animation:floatUp .8s ease-out forwards}
+.pts-pop{position:fixed;font-size:1.5rem;font-weight:900;color:var(--gold);pointer-events:none;z-index:200;font-family:'Noto Serif JP',serif;text-shadow:1px 1px 0 var(--dark);animation:floatUp .8s ease-out forwards}
 @keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-70px) scale(.8)}}
 </style>
 </head>
@@ -140,6 +140,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="hdr">
     <h1>ひらがな 학습</h1>
     <p>히라가나 오십음도 마스터</p>
+    <p class="version">v1.0.0 · 2026.09.15</p>
   </div>
   <div class="divider"><span>❖</span></div>
 
@@ -177,7 +178,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 <!-- ── GAME SCREEN ── -->
 <div id="scr-game" class="screen" hidden>
   <div class="hud">
-    <div class="hud-score-wrap">
+    <div>
       <span class="hud-score-lbl">점수</span>
       <span class="hud-score" id="hud-score">0</span>
     </div>
@@ -193,6 +194,9 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <button class="cho-btn" id="b0"></button>
     <button class="cho-btn" id="b1"></button>
     <button class="cho-btn" id="b2"></button>
+    <button class="cho-btn" id="b3"></button>
+    <button class="cho-btn" id="b4"></button>
+    <button class="cho-btn" id="b5"></button>
   </div>
 
   <div class="gctrls">
@@ -257,12 +261,12 @@ const HALL = [...H50, ...HDK];
 const ALL_R = [...new Set(HALL.map(x => x.r))];
 
 const SET_NAMES = {'50on':'50음도','dakuten':'탁음+반탁음','all':'전체'};
+const BTN_IDS = ['b0','b1','b2','b3','b4','b5'];
 
 // ═══════════════════ STATE ═══════════════════
 let selSet = '50on', selMin = 3;
 let audioCtx = null;
 
-// game
 let fullSet=[], remaining=[], mistakes=[], cur=null;
 let tries=0, qNum=0, pts=0, answered=0;
 let startMs=0, limitSec=0, pausedAt=0, totalPausedMs=0;
@@ -272,33 +276,54 @@ let ticker=null;
 // ═══════════════════ AUDIO ═══════════════════
 function ac() {
   if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  // Resume if suspended (happens on mobile after inactivity or between games)
+  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
+
 function tone(freq, t0, dur, type='sine', vol=0.28) {
   try {
     const ctx=ac(), o=ctx.createOscillator(), g=ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
     o.type=type; o.frequency.value=freq;
-    g.gain.setValueAtTime(vol,t0);
-    g.gain.exponentialRampToValueAtTime(0.001,t0+dur);
+    g.gain.setValueAtTime(vol, t0);
+    g.gain.exponentialRampToValueAtTime(0.001, t0+dur);
     o.start(t0); o.stop(t0+dur);
   } catch(e){}
 }
+
+function playWhenReady(fn) {
+  try {
+    const ctx = ac();
+    if (ctx.state === 'running') {
+      fn(ctx);
+    } else {
+      ctx.resume().then(() => fn(ctx)).catch(()=>{});
+    }
+  } catch(e){}
+}
+
 function sndStart() {
-  try { const t=ac().currentTime; tone(261.63,t,.14); tone(329.63,t+.11,.14); tone(392,t+.22,.2); } catch(e){}
+  playWhenReady(ctx => {
+    const t = ctx.currentTime;
+    tone(261.63, t, .14); tone(329.63, t+.11, .14); tone(392, t+.22, .2);
+  });
 }
 function sndOk() {
-  try { const t=ac().currentTime; tone(880,t,.07); tone(1100,t+.06,.1); tone(1320,t+.12,.15); } catch(e){}
+  playWhenReady(ctx => {
+    const t = ctx.currentTime;
+    tone(880, t, .07); tone(1100, t+.06, .1); tone(1320, t+.12, .15);
+  });
 }
 function sndWrong() {
-  try { tone(160, ac().currentTime, .13, 'square', .12); } catch(e){}
+  playWhenReady(ctx => { tone(160, ctx.currentTime, .13, 'square', .12); });
 }
 function sndEnd() {
-  try {
-    const t=ac().currentTime;
+  playWhenReady(ctx => {
+    const t = ctx.currentTime;
     [523.25,659.25,783.99,659.25,783.99,1046.5,783.99,1046.5]
-      .forEach((f,i)=>tone(f,t+i*.22,.25,'sine',.22));
-  } catch(e){}
+      .forEach((f,i) => tone(f, t+i*.22, .25, 'sine', .22));
+  });
 }
 
 // ═══════════════════ POOL ═══════════════════
@@ -307,11 +332,13 @@ function shuffle(a) {
   for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
   return b;
 }
+
 function initPool() {
   fullSet = selSet==='50on'?[...H50]:selSet==='dakuten'?[...HDK]:[...HALL];
   remaining = shuffle([...fullSet]);
   mistakes = [];
 }
+
 function nextChar() {
   if (remaining.length===0) {
     if (mistakes.length===0) { remaining=shuffle([...fullSet]); }
@@ -321,9 +348,26 @@ function nextChar() {
   const ch=remaining[i]; remaining.splice(i,1);
   return ch;
 }
+
+// Vowel grouping for similar-sounding distractors
+function vowelOf(r) {
+  if ('아카가사자타다나하바파마라와야'.includes(r)) return 'a';
+  if ('이키기시지치니히비피미리'.includes(r)) return 'i';
+  if ('우쿠구스즈츠누후부푸무루유'.includes(r)) return 'u';
+  if ('에케게세제테데네헤베페메레'.includes(r)) return 'e';
+  if ('오코고소조토도노호보포모로워요'.includes(r)) return 'o';
+  return 'x';
+}
+
 function mkChoices(correct) {
-  const wrong=shuffle(ALL_R.filter(r=>r!==correct.r));
-  return shuffle([correct.r, wrong[0], wrong[1]]);
+  const vg = vowelOf(correct.r);
+  // Similar = same vowel (confusing distractors), different = other vowels
+  const similar = shuffle(ALL_R.filter(r => r !== correct.r && vowelOf(r) === vg));
+  const differ  = shuffle(ALL_R.filter(r => r !== correct.r && vowelOf(r) !== vg));
+  // Try 2 similar + 3 different; fall back if not enough similar
+  const simN = Math.min(2, similar.length);
+  const wrongs = [...similar.slice(0, simN), ...differ.slice(0, 5 - simN)];
+  return shuffle([correct.r, ...wrongs]);
 }
 
 // ═══════════════════ GAME ═══════════════════
@@ -341,17 +385,17 @@ function startGame() {
   startMs=Date.now();
   ticker=setInterval(tick,400);
   sndStart();
-  setTimeout(nextQ,450);
+  setTimeout(nextQ, 450);
 }
 
 function tick() {
   if(paused||over) return;
-  const rem=limitSec-(Date.now()-startMs-totalPausedMs)/1000;
+  const rem = limitSec-(Date.now()-startMs-totalPausedMs)/1000;
   if(rem<=0){endGame();return;}
   const m=Math.floor(rem/60), s=Math.floor(rem%60);
   const el=document.getElementById('hud-timer');
   el.textContent=pad(m)+':'+pad(s);
-  el.classList.toggle('urgent',rem<=10);
+  el.classList.toggle('urgent', rem<=10);
 }
 
 function pad(n){return String(n).padStart(2,'0')}
@@ -363,7 +407,7 @@ function nextQ() {
   const ch=mkChoices(cur);
   document.getElementById('main-char').textContent=cur.c;
   document.getElementById('hud-qnum').textContent=`문제 ${qNum}`;
-  ['b0','b1','b2'].forEach((id,i)=>{
+  BTN_IDS.forEach((id,i)=>{
     const b=document.getElementById(id);
     b.textContent=ch[i]; b.dataset.r=ch[i];
     b.className='cho-btn'; b.disabled=false; b.blur();
@@ -378,15 +422,13 @@ function answer(btn, r) {
     pts+=p; answered++;
     if(tries>1) mistakes.push(cur);
     btn.classList.add('correct');
-    ['b0','b1','b2'].forEach(id=>document.getElementById(id).disabled=true);
-    // score update
+    BTN_IDS.forEach(id=>document.getElementById(id).disabled=true);
     const se=document.getElementById('hud-score');
     se.textContent=pts;
     se.classList.remove('score-flash'); void se.offsetWidth; se.classList.add('score-flash');
-    // pop indicator
     showPop(btn, '+'+p+'점');
     sndOk();
-    setTimeout(()=>{if(!over)nextQ();},420);
+    setTimeout(()=>{if(!over)nextQ();}, 420);
   } else {
     btn.classList.add('wrong'); btn.disabled=true;
     sndWrong();
@@ -414,7 +456,7 @@ function resumeGame() {
   document.getElementById('pause-ov').hidden=true;
 }
 function stopGame() {
-  if(paused){totalPausedMs+=Date.now()-pausedAt;paused=false;}
+  if(paused){totalPausedMs+=Date.now()-pausedAt; paused=false;}
   document.getElementById('pause-ov').hidden=true;
   endGame();
 }
@@ -422,25 +464,16 @@ function stopGame() {
 function endGame() {
   if(over) return;
   over=true; clearInterval(ticker);
-  if(paused){totalPausedMs+=Date.now()-pausedAt;paused=false;}
+  if(paused){totalPausedMs+=Date.now()-pausedAt; paused=false;}
   document.getElementById('pause-ov').hidden=true;
 
   const sec=Math.min(elapsed(), limitSec);
   const minF=Math.max(Math.ceil((sec/60)*10)/10, 0.1);
   const final=Math.ceil((pts/minF)*10)/10;
 
-  saveHistory({
-    ts:new Date().toISOString(),
-    set:selSet,
-    selMin,
-    sec:Math.floor(sec),
-    pts,
-    answered,
-    final
-  });
-
+  saveHistory({ts:new Date().toISOString(), set:selSet, selMin, sec:Math.floor(sec), pts, answered, final});
   sndEnd();
-  setTimeout(()=>showResult(sec,final), 600);
+  setTimeout(()=>showResult(sec, final), 600);
 }
 
 function showResult(sec, final) {
@@ -459,7 +492,7 @@ function showResult(sec, final) {
 const HK='hira_hist_v1';
 function saveHistory(e){
   let h=getHistory(); h.unshift(e);
-  if(h.length>20)h=h.slice(0,20);
+  if(h.length>20) h=h.slice(0,20);
   try{localStorage.setItem(HK,JSON.stringify(h));}catch(_){}
 }
 function getHistory(){
@@ -486,7 +519,7 @@ function showScr(name){
   ['start','game','result'].forEach(n=>{
     document.getElementById('scr-'+n).hidden=(n!==name);
   });
-  if(name==='start')renderHistory();
+  if(name==='start') renderHistory();
 }
 
 // ═══════════════════ EVENTS ═══════════════════
@@ -498,17 +531,17 @@ document.querySelectorAll('.dur-btn').forEach(b=>b.addEventListener('click',()=>
   document.querySelectorAll('.dur-btn').forEach(x=>x.classList.remove('on'));
   b.classList.add('on'); selMin=+b.dataset.min;
 }));
-document.getElementById('start-btn').addEventListener('click',startGame);
-['b0','b1','b2'].forEach(id=>{
+document.getElementById('start-btn').addEventListener('click', startGame);
+BTN_IDS.forEach(id=>{
   const b=document.getElementById(id);
-  b.addEventListener('click',()=>answer(b,b.dataset.r));
+  b.addEventListener('click',()=>answer(b, b.dataset.r));
 });
-document.getElementById('pause-btn').addEventListener('click',pauseGame);
+document.getElementById('pause-btn').addEventListener('click', pauseGame);
 document.getElementById('stop-btn').addEventListener('click',()=>{
-  if(confirm('게임을 중단하시겠습니까?'))stopGame();
+  if(confirm('게임을 중단하시겠습니까?')) stopGame();
 });
-document.getElementById('resume-btn').addEventListener('click',resumeGame);
-document.getElementById('stop-p-btn').addEventListener('click',stopGame);
+document.getElementById('resume-btn').addEventListener('click', resumeGame);
+document.getElementById('stop-p-btn').addEventListener('click', stopGame);
 document.getElementById('again-btn').addEventListener('click',()=>showScr('start'));
 
 // ═══════════════════ INIT ═══════════════════
