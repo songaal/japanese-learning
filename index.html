@@ -131,8 +131,18 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .stat-box{background:var(--cream);border-radius:10px;padding:12px}
 .stat-val{font-size:1.6rem;font-weight:700;color:var(--dark)}
 .stat-lbl{font-size:.75rem;color:var(--gray)}
-.again-btn{width:100%;padding:16px;background:var(--red);color:var(--white);border:none;border-radius:12px;font-size:1.15rem;font-family:'Noto Serif JP',serif;cursor:pointer;box-shadow:0 4px 0 var(--red-d);transition:all .15s;margin-top:8px}
+.result-btns{display:flex;gap:10px;margin-top:10px}
+.home-btn{flex:1;padding:14px 8px;background:transparent;color:var(--red);border:2px solid var(--red);border-radius:12px;font-size:1.05rem;font-family:'Noto Serif JP',serif;cursor:pointer;transition:all .15s}
+.home-btn:hover{background:#FFF5F5;transform:translateY(-2px)}
+.again-btn{flex:1;padding:14px 8px;background:var(--red);color:var(--white);border:none;border-radius:12px;font-size:1.05rem;font-family:'Noto Serif JP',serif;cursor:pointer;box-shadow:0 4px 0 var(--red-d);transition:all .15s}
 .again-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--red-d)}
+/* ── START SCREEN FLEX ── */
+#scr-start{display:flex;flex-direction:column;min-height:100%}
+#scr-start>.version{margin-top:auto}
+/* ── LANDSCAPE LOCK ── */
+@media(orientation:landscape) and (max-height:500px){
+  body::after{content:'📱 세로로 돌려주세요';position:fixed;inset:0;background:rgba(44,27,14,.92);color:#FAF6ED;font-size:1.3rem;display:flex;align-items:center;justify-content:center;z-index:9999;pointer-events:none}
+}
 
 /* ── SCORE FLASH ── */
 @keyframes scoreFlash{0%{transform:scale(1.5);color:var(--gold)}100%{transform:scale(1);color:var(--red)}}
@@ -180,7 +190,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <div id="hist-wrap"><div class="hist-empty">아직 연습 기록이 없습니다.</div></div>
   </div>
 
-  <p class="version">v1.0.0 · 2026.09.15 16:38</p>
+  <p class="version">v1.1.0 · 2026.09.15 17:18</p>
 </div>
 
 <!-- ── GAME SCREEN ── -->
@@ -241,7 +251,10 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
       <div class="stat-box"><div class="stat-val" id="res-set">50음도</div><div class="stat-lbl">학습 세트</div></div>
     </div>
   </div>
-  <button class="again-btn" id="again-btn">다시 연습하기 ↩</button>
+  <div class="result-btns">
+    <button class="home-btn" id="home-btn">홈으로 ↩</button>
+    <button class="again-btn" id="again-btn">다시하기 ▶</button>
+  </div>
 </div>
 
 <script>
@@ -331,6 +344,21 @@ function sndEnd() {
     const t = ctx.currentTime;
     [523.25,659.25,783.99,659.25,783.99,1046.5,783.99,1046.5]
       .forEach((f,i) => tone(f, t+i*.22, .25, 'sine', .22));
+  });
+}
+function sndFanfare() {
+  playWhenReady(ctx => {
+    const t = ctx.currentTime;
+    // 빠른 상행 + 꺾기 + 웅장한 피날레
+    [[523.25,t,.08],[659.25,t+.07,.08],[783.99,t+.14,.08],[1046.5,t+.21,.10],
+     [783.99,t+.31,.06],[1046.5,t+.37,.06],[1318.5,t+.43,.32],
+     [523.25,t+.85,.06],[659.25,t+.91,.06],[783.99,t+.97,.06],
+     [1046.5,t+1.03,.06],[1318.5,t+1.09,.06],[1567.0,t+1.15,.08],
+     [1976.0,t+1.23,.55]]
+    .forEach(([f,s,d])=>tone(f,s,d,'sine',.28));
+    // 화음 베이스
+    [[261.63,t+.43,.32],[261.63,t+1.15,.55]]
+      .forEach(([f,s,d])=>tone(f,s,d,'sine',.12));
   });
 }
 
@@ -483,21 +511,58 @@ function endGame() {
   const minF=Math.max(Math.ceil((sec/60)*10)/10, 0.1);
   const final=Math.ceil((pts/minF)*10)/10;
 
+  const prevBest=getBestScore();
+  const isRecord=prevBest>=0 && final>prevBest;
   saveHistory({ts:new Date().toISOString(), set:selSet, selMin, sec:Math.floor(sec), pts, answered, final});
-  setTimeout(()=>showResult(sec, final), 200);
+  setTimeout(()=>showResult(sec, final, isRecord), 200);
 }
 
-function showResult(sec, final) {
+function showResult(sec, final, isRecord) {
   const m=Math.floor(sec/60), s=Math.floor(sec%60);
-  sndEnd();
   document.getElementById('res-final').textContent=final.toFixed(1);
   document.getElementById('res-pts').textContent=pts;
   document.getElementById('res-qs').textContent=answered;
   document.getElementById('res-time').textContent=m+':'+pad(s);
   document.getElementById('res-set').textContent=SET_NAMES[selSet]||selSet;
   document.getElementById('res-emoji').textContent=
-    final>=30?'🏆':final>=15?'🌸':final>=8?'😊':'📚';
+    isRecord?'🏆':final>=30?'🥇':final>=15?'🌸':final>=8?'😊':'📚';
+  document.getElementById('scr-result').querySelector('.res-title').textContent=
+    isRecord?'🎉 신기록 달성!':'연습 완료!';
   showScr('result');
+  if(isRecord){ sndFanfare(); setTimeout(launchConfetti, 100); }
+  else sndEnd();
+}
+
+// ═══════════════════ CONFETTI ═══════════════════
+function launchConfetti() {
+  const cv=document.createElement('canvas');
+  cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:500';
+  cv.width=window.innerWidth; cv.height=window.innerHeight;
+  document.body.appendChild(cv);
+  const cx=cv.getContext('2d');
+  const COLS=['#FFD166','#FF6B6B','#EE4266','#C0392B','#F8D7DA','#6BCB77','#4D96FF','#FFB347','#FFFFFF'];
+  const ps=Array.from({length:150},()=>({
+    x:Math.random()*cv.width, y:-20-Math.random()*120,
+    w:7+Math.random()*9, h:3+Math.random()*5,
+    color:COLS[Math.floor(Math.random()*COLS.length)],
+    vx:(Math.random()-.5)*3.5, vy:2.5+Math.random()*3.5,
+    rot:Math.random()*Math.PI*2, rs:(Math.random()-.5)*.18, op:1
+  }));
+  let fr=0;
+  (function draw(){
+    cx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rs;
+      if(p.y>cv.height*.65) p.op=Math.max(0,p.op-.025);
+      cx.save(); cx.translate(p.x,p.y); cx.rotate(p.rot);
+      cx.globalAlpha=p.op; cx.fillStyle=p.color;
+      cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      cx.restore();
+    });
+    fr++;
+    if(fr<220&&ps.some(p=>p.op>0)) requestAnimationFrame(draw);
+    else cv.remove();
+  })();
 }
 
 // ═══════════════════ HISTORY ═══════════════════
@@ -509,6 +574,9 @@ function saveHistory(e){
 }
 function getHistory(){
   try{return JSON.parse(localStorage.getItem(HK))||[];}catch(_){return [];}
+}
+function getBestScore(){
+  const h=getHistory(); return h.length ? Math.max(...h.map(e=>e.final)) : -1;
 }
 function renderHistory(){
   const h=getHistory(), wrap=document.getElementById('hist-wrap');
@@ -554,9 +622,11 @@ document.getElementById('stop-btn').addEventListener('click',()=>{
 });
 document.getElementById('resume-btn').addEventListener('click', resumeGame);
 document.getElementById('stop-p-btn').addEventListener('click', stopGame);
-document.getElementById('again-btn').addEventListener('click',()=>showScr('start'));
+document.getElementById('home-btn').addEventListener('click',()=>showScr('start'));
+document.getElementById('again-btn').addEventListener('click', startGame);
 
 // ═══════════════════ INIT ═══════════════════
+try{ screen.orientation.lock('portrait').catch(()=>{}); }catch(_){}
 showScr('start');
 </script>
 </body>
