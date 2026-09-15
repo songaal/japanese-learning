@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ひらがな 학습 게임</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#C0392B;--red-l:#E74C3C;--red-d:#922B21;
+  --cream:#FAF6ED;--cream-d:#EDE4D0;
+  --dark:#2C1B0E;--dark-m:#5D3A1A;
+  --gold:#C9A84C;--gray:#9B8773;
+  --white:#FFF;--green:#27AE60;
+}
+body{font-family:'Noto Sans KR','맑은 고딕',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--cream-d) 1px,transparent 1px);background-size:28px 28px;opacity:.45;pointer-events:none;z-index:0}
+
+.screen{position:relative;z-index:1;min-height:100vh;padding:16px;max-width:580px;margin:0 auto}
+[hidden]{display:none!important}
+
+/* ── HEADER ── */
+.hdr{text-align:center;padding:24px 0 14px;position:relative}
+.hdr::before,.hdr::after{content:'✿';color:var(--red);font-size:1.1rem;position:absolute;top:50%;transform:translateY(-50%)}
+.hdr::before{left:10px}.hdr::after{right:10px}
+.hdr h1{font-family:'Noto Serif JP',serif;font-size:1.9rem;color:var(--red);letter-spacing:.05em;text-shadow:2px 2px 0 var(--cream-d)}
+.hdr p{font-size:.8rem;color:var(--gray);margin-top:4px;letter-spacing:.1em}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:8px;margin:14px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent)}
+.divider span{color:var(--gold);font-size:.9rem}
+
+/* ── SETTING CARD ── */
+.card{background:var(--white);border:2px solid var(--gold);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:4px 4px 0 var(--cream-d)}
+.card-title{font-family:'Noto Serif JP',serif;font-size:.9rem;color:var(--red-d);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card-title::before{content:'◆';font-size:.65rem;color:var(--red)}
+
+/* ── CHAR SET BUTTONS ── */
+.set-btns{display:flex;gap:8px}
+.set-btn{flex:1;padding:10px 6px;border:2px solid var(--cream-d);border-radius:8px;background:var(--cream);cursor:pointer;text-align:center;font-size:.8rem;transition:all .2s;font-family:'Noto Sans KR',sans-serif;color:var(--dark)}
+.set-btn .jc{font-family:'Noto Serif JP',serif;font-size:1.1rem;display:block;margin-bottom:3px}
+.set-btn:hover{border-color:var(--red);background:#FFF5F5}
+.set-btn.on{border-color:var(--red);background:var(--red);color:var(--white)}
+.set-btn.on .jc{color:var(--white)}
+
+/* ── DURATION BUTTONS ── */
+.dur-btns{display:flex;gap:6px;flex-wrap:wrap}
+.dur-btn{padding:7px 11px;border:2px solid var(--cream-d);border-radius:6px;background:var(--cream);cursor:pointer;font-size:.85rem;transition:all .2s;font-family:'Noto Sans KR',sans-serif;color:var(--dark)}
+.dur-btn:hover{border-color:var(--red)}
+.dur-btn.on{border-color:var(--red);background:var(--red);color:var(--white)}
+
+/* ── START BUTTON ── */
+.start-btn{width:100%;padding:16px;background:var(--red);color:var(--white);border:none;border-radius:12px;font-size:1.25rem;font-family:'Noto Serif JP',serif;cursor:pointer;letter-spacing:.1em;box-shadow:0 4px 0 var(--red-d);transition:all .15s;margin-bottom:20px;display:block}
+.start-btn:hover{background:var(--red-l);transform:translateY(-2px);box-shadow:0 6px 0 var(--red-d)}
+.start-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--red-d)}
+
+/* ── HISTORY ── */
+.hist-empty{text-align:center;color:var(--gray);font-size:.85rem;padding:16px}
+.hist-list{list-style:none;max-height:280px;overflow-y:auto}
+.hist-list::-webkit-scrollbar{width:4px}
+.hist-list::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+.hist-item{padding:9px 10px;border-bottom:1px solid var(--cream-d);display:grid;grid-template-columns:1fr auto;gap:2px;font-size:.82rem}
+.hist-item:last-child{border-bottom:none}
+.hist-date{color:var(--gray);font-size:.72rem}
+.hist-set{color:var(--dark);font-weight:500}
+.hist-score{color:var(--red);font-weight:700;font-size:.95rem;text-align:right}
+.hist-detail{color:var(--gray);font-size:.72rem;text-align:right}
+
+/* ── GAME HUD ── */
+.hud{display:flex;justify-content:space-between;align-items:center;padding:12px 0 8px}
+.hud-score-wrap{}
+.hud-score-lbl{font-size:.68rem;color:var(--gray);display:block}
+.hud-score{font-family:'Noto Serif JP',serif;font-size:1.6rem;color:var(--red);display:block;line-height:1}
+.hud-timer{font-size:1.9rem;font-weight:700;color:var(--dark);font-variant-numeric:tabular-nums;letter-spacing:.05em}
+.hud-timer.urgent{color:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hud-qnum{font-size:.78rem;color:var(--gray);text-align:right}
+
+/* ── CHAR DISPLAY ── */
+.char-box{background:var(--white);border:3px solid var(--red);border-radius:14px;padding:36px 16px;text-align:center;margin-bottom:20px;box-shadow:6px 6px 0 var(--cream-d),inset 0 0 0 2px var(--cream-d);position:relative;overflow:hidden}
+.char-box::before{content:'';position:absolute;top:-18px;right:-18px;width:72px;height:72px;border-radius:50%;border:3px solid var(--gold);opacity:.25}
+.char-box::after{content:'';position:absolute;bottom:-16px;left:-16px;width:56px;height:56px;border-radius:50%;border:3px solid var(--gold);opacity:.25}
+.main-char{font-family:'Noto Serif JP',serif;font-size:7rem;line-height:1;color:var(--dark);font-weight:900;display:block;user-select:none}
+
+/* ── CHOICES ── */
+.choices{display:flex;gap:10px;margin-bottom:22px}
+.cho-btn{flex:1;padding:18px 8px;border:2px solid var(--cream-d);border-radius:10px;background:var(--white);font-size:1.3rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:700;transition:all .15s;box-shadow:0 3px 0 var(--cream-d);color:var(--dark)}
+.cho-btn:hover:not(:disabled){border-color:var(--red);background:#FFF5F5;transform:translateY(-2px);box-shadow:0 5px 0 var(--cream-d)}
+.cho-btn:active:not(:disabled){transform:translateY(1px);box-shadow:0 2px 0 var(--cream-d)}
+.cho-btn.wrong{border-color:var(--red-l)!important;background:#FDEDEC!important;color:var(--red-l)!important;box-shadow:0 3px 0 var(--red-d)!important}
+.cho-btn.correct{border-color:var(--green)!important;background:#EAFAF1!important;color:var(--green)!important}
+.cho-btn:disabled{cursor:default}
+
+/* ── GAME CONTROLS ── */
+.gctrls{display:flex;gap:10px;justify-content:center}
+.ctrl-btn{padding:9px 22px;border:2px solid var(--gray);border-radius:8px;background:transparent;color:var(--gray);font-size:.88rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .2s}
+.ctrl-btn:hover{border-color:var(--dark-m);color:var(--dark-m)}
+.ctrl-btn.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* ── PAUSE OVERLAY ── */
+#pause-ov{position:fixed;inset:0;background:rgba(44,27,14,.76);z-index:100;display:flex;align-items:center;justify-content:center}
+.pause-box{background:var(--cream);border:3px solid var(--gold);border-radius:16px;padding:36px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.pause-title{font-family:'Noto Serif JP',serif;font-size:1.9rem;color:var(--red);margin-bottom:6px}
+.pause-sub{color:var(--gray);font-size:.85rem;margin-bottom:26px}
+.pause-btns{display:flex;gap:10px;justify-content:center}
+.resume-btn{padding:13px 28px;background:var(--red);color:var(--white);border:none;border-radius:10px;font-size:1.05rem;font-family:'Noto Serif JP',serif;cursor:pointer;box-shadow:0 4px 0 var(--red-d);transition:all .15s}
+.resume-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--red-d)}
+.stop-p-btn{padding:13px 28px;background:transparent;color:var(--gray);border:2px solid var(--gray);border-radius:10px;font-size:1rem;cursor:pointer;transition:all .2s}
+.stop-p-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── RESULT ── */
+.result-card{background:var(--white);border:3px solid var(--gold);border-radius:16px;padding:36px 26px;text-align:center;margin:14px 0;box-shadow:6px 6px 0 var(--cream-d)}
+.res-emoji{font-size:3.5rem;margin-bottom:10px}
+.res-title{font-family:'Noto Serif JP',serif;font-size:1.7rem;color:var(--red);margin-bottom:4px}
+.res-final{font-size:3.2rem;font-weight:900;color:var(--red);font-family:'Noto Serif JP',serif;margin:14px 0 4px}
+.res-lbl{color:var(--gray);font-size:.82rem}
+.res-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.stat-box{background:var(--cream);border-radius:10px;padding:12px}
+.stat-val{font-size:1.6rem;font-weight:700;color:var(--dark)}
+.stat-lbl{font-size:.75rem;color:var(--gray)}
+.again-btn{width:100%;padding:16px;background:var(--red);color:var(--white);border:none;border-radius:12px;font-size:1.15rem;font-family:'Noto Serif JP',serif;cursor:pointer;box-shadow:0 4px 0 var(--red-d);transition:all .15s;margin-top:8px}
+.again-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--red-d)}
+
+/* ── SCORE FLASH ── */
+@keyframes scoreFlash{0%{transform:scale(1.5);color:var(--gold)}100%{transform:scale(1);color:var(--red)}}
+.score-flash{animation:scoreFlash .4s ease-out}
+
+/* ── POINTS POP ── */
+.pts-pop{position:fixed;font-size:1.6rem;font-weight:900;color:var(--gold);pointer-events:none;z-index:200;font-family:'Noto Serif JP',serif;text-shadow:1px 1px 0 var(--dark);animation:floatUp .8s ease-out forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-70px) scale(.8)}}
+</style>
+</head>
+<body>
+
+<!-- ── START SCREEN ── -->
+<div id="scr-start" class="screen">
+  <div class="hdr">
+    <h1>ひらがな 학습</h1>
+    <p>히라가나 오십음도 마스터</p>
+  </div>
+  <div class="divider"><span>❖</span></div>
+
+  <div class="card">
+    <div class="card-title">문자 세트 선택</div>
+    <div class="set-btns">
+      <button class="set-btn on" data-set="50on"><span class="jc">あ〜ん</span>50음도<br><small>(46자)</small></button>
+      <button class="set-btn" data-set="dakuten"><span class="jc">が〜ぽ</span>탁음+반탁음<br><small>(25자)</small></button>
+      <button class="set-btn" data-set="all"><span class="jc">全</span>전체<br><small>(71자)</small></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">연습 시간 선택</div>
+    <div class="dur-btns">
+      <button class="dur-btn" data-min="1">1분</button>
+      <button class="dur-btn on" data-min="3">3분</button>
+      <button class="dur-btn" data-min="5">5분</button>
+      <button class="dur-btn" data-min="7">7분</button>
+      <button class="dur-btn" data-min="10">10분</button>
+      <button class="dur-btn" data-min="15">15분</button>
+      <button class="dur-btn" data-min="20">20분</button>
+      <button class="dur-btn" data-min="30">30분</button>
+    </div>
+  </div>
+
+  <button class="start-btn" id="start-btn">게임 시작 ▶</button>
+
+  <div class="card">
+    <div class="card-title">📋 최근 연습 기록</div>
+    <div id="hist-wrap"><div class="hist-empty">아직 연습 기록이 없습니다.</div></div>
+  </div>
+</div>
+
+<!-- ── GAME SCREEN ── -->
+<div id="scr-game" class="screen" hidden>
+  <div class="hud">
+    <div class="hud-score-wrap">
+      <span class="hud-score-lbl">점수</span>
+      <span class="hud-score" id="hud-score">0</span>
+    </div>
+    <div class="hud-timer" id="hud-timer">03:00</div>
+    <div class="hud-qnum" id="hud-qnum">문제 1</div>
+  </div>
+
+  <div class="char-box">
+    <span class="main-char" id="main-char">あ</span>
+  </div>
+
+  <div class="choices">
+    <button class="cho-btn" id="b0"></button>
+    <button class="cho-btn" id="b1"></button>
+    <button class="cho-btn" id="b2"></button>
+  </div>
+
+  <div class="gctrls">
+    <button class="ctrl-btn" id="pause-btn">⏸ 일시정지</button>
+    <button class="ctrl-btn danger" id="stop-btn">⏹ 중단</button>
+  </div>
+</div>
+
+<!-- ── PAUSE OVERLAY ── -->
+<div id="pause-ov" hidden>
+  <div class="pause-box">
+    <div class="pause-title">⏸ 일시정지</div>
+    <div class="pause-sub">게임이 멈춰있습니다</div>
+    <div class="pause-btns">
+      <button class="resume-btn" id="resume-btn">▶ 재개</button>
+      <button class="stop-p-btn" id="stop-p-btn">■ 중단</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESULT SCREEN ── -->
+<div id="scr-result" class="screen" hidden>
+  <div class="hdr"><h1>결과</h1></div>
+  <div class="result-card">
+    <div class="res-emoji" id="res-emoji">🌸</div>
+    <div class="res-title">연습 완료!</div>
+    <div class="res-lbl">분당 점수 (최종 점수)</div>
+    <div class="res-final" id="res-final">0.0</div>
+    <div class="res-lbl">점 / 분</div>
+    <div class="res-stats">
+      <div class="stat-box"><div class="stat-val" id="res-pts">0</div><div class="stat-lbl">총 획득 점수</div></div>
+      <div class="stat-box"><div class="stat-val" id="res-qs">0</div><div class="stat-lbl">풀어본 문제 수</div></div>
+      <div class="stat-box"><div class="stat-val" id="res-time">0:00</div><div class="stat-lbl">연습 시간</div></div>
+      <div class="stat-box"><div class="stat-val" id="res-set">50음도</div><div class="stat-lbl">학습 세트</div></div>
+    </div>
+  </div>
+  <button class="again-btn" id="again-btn">다시 연습하기 ↩</button>
+</div>
+
+<script>
+// ═══════════════════ DATA ═══════════════════
+const H50 = [
+  {c:'あ',r:'아'},{c:'い',r:'이'},{c:'う',r:'우'},{c:'え',r:'에'},{c:'お',r:'오'},
+  {c:'か',r:'카'},{c:'き',r:'키'},{c:'く',r:'쿠'},{c:'け',r:'케'},{c:'こ',r:'코'},
+  {c:'さ',r:'사'},{c:'し',r:'시'},{c:'す',r:'스'},{c:'せ',r:'세'},{c:'そ',r:'소'},
+  {c:'た',r:'타'},{c:'ち',r:'치'},{c:'つ',r:'츠'},{c:'て',r:'테'},{c:'と',r:'토'},
+  {c:'な',r:'나'},{c:'に',r:'니'},{c:'ぬ',r:'누'},{c:'ね',r:'네'},{c:'の',r:'노'},
+  {c:'は',r:'하'},{c:'ひ',r:'히'},{c:'ふ',r:'후'},{c:'へ',r:'헤'},{c:'ほ',r:'호'},
+  {c:'ま',r:'마'},{c:'み',r:'미'},{c:'む',r:'무'},{c:'め',r:'메'},{c:'も',r:'모'},
+  {c:'や',r:'야'},{c:'ゆ',r:'유'},{c:'よ',r:'요'},
+  {c:'ら',r:'라'},{c:'り',r:'리'},{c:'る',r:'루'},{c:'れ',r:'레'},{c:'ろ',r:'로'},
+  {c:'わ',r:'와'},{c:'を',r:'워'},{c:'ん',r:'응'}
+];
+const HDK = [
+  {c:'が',r:'가'},{c:'ぎ',r:'기'},{c:'ぐ',r:'구'},{c:'げ',r:'게'},{c:'ご',r:'고'},
+  {c:'ざ',r:'자'},{c:'じ',r:'지'},{c:'ず',r:'즈'},{c:'ぜ',r:'제'},{c:'ぞ',r:'조'},
+  {c:'だ',r:'다'},{c:'ぢ',r:'지'},{c:'づ',r:'즈'},{c:'で',r:'데'},{c:'ど',r:'도'},
+  {c:'ば',r:'바'},{c:'び',r:'비'},{c:'ぶ',r:'부'},{c:'べ',r:'베'},{c:'ぼ',r:'보'},
+  {c:'ぱ',r:'파'},{c:'ぴ',r:'피'},{c:'ぷ',r:'푸'},{c:'ぺ',r:'페'},{c:'ぽ',r:'포'}
+];
+const HALL = [...H50, ...HDK];
+const ALL_R = [...new Set(HALL.map(x => x.r))];
+
+const SET_NAMES = {'50on':'50음도','dakuten':'탁음+반탁음','all':'전체'};
+
+// ═══════════════════ STATE ═══════════════════
+let selSet = '50on', selMin = 3;
+let audioCtx = null;
+
+// game
+let fullSet=[], remaining=[], mistakes=[], cur=null;
+let tries=0, qNum=0, pts=0, answered=0;
+let startMs=0, limitSec=0, pausedAt=0, totalPausedMs=0;
+let paused=false, over=false;
+let ticker=null;
+
+// ═══════════════════ AUDIO ═══════════════════
+function ac() {
+  if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function tone(freq, t0, dur, type='sine', vol=0.28) {
+  try {
+    const ctx=ac(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,t0);
+    g.gain.exponentialRampToValueAtTime(0.001,t0+dur);
+    o.start(t0); o.stop(t0+dur);
+  } catch(e){}
+}
+function sndStart() {
+  try { const t=ac().currentTime; tone(261.63,t,.14); tone(329.63,t+.11,.14); tone(392,t+.22,.2); } catch(e){}
+}
+function sndOk() {
+  try { const t=ac().currentTime; tone(880,t,.07); tone(1100,t+.06,.1); tone(1320,t+.12,.15); } catch(e){}
+}
+function sndWrong() {
+  try { tone(160, ac().currentTime, .13, 'square', .12); } catch(e){}
+}
+function sndEnd() {
+  try {
+    const t=ac().currentTime;
+    [523.25,659.25,783.99,659.25,783.99,1046.5,783.99,1046.5]
+      .forEach((f,i)=>tone(f,t+i*.22,.25,'sine',.22));
+  } catch(e){}
+}
+
+// ═══════════════════ POOL ═══════════════════
+function shuffle(a) {
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}
+  return b;
+}
+function initPool() {
+  fullSet = selSet==='50on'?[...H50]:selSet==='dakuten'?[...HDK]:[...HALL];
+  remaining = shuffle([...fullSet]);
+  mistakes = [];
+}
+function nextChar() {
+  if (remaining.length===0) {
+    if (mistakes.length===0) { remaining=shuffle([...fullSet]); }
+    else { remaining=shuffle([...mistakes]); mistakes=[]; }
+  }
+  const i=Math.floor(Math.random()*remaining.length);
+  const ch=remaining[i]; remaining.splice(i,1);
+  return ch;
+}
+function mkChoices(correct) {
+  const wrong=shuffle(ALL_R.filter(r=>r!==correct.r));
+  return shuffle([correct.r, wrong[0], wrong[1]]);
+}
+
+// ═══════════════════ GAME ═══════════════════
+function startGame() {
+  initPool();
+  pts=0; answered=0; qNum=0; tries=0;
+  over=false; paused=false; totalPausedMs=0;
+  limitSec=selMin*60;
+  showScr('game');
+  startMs=Date.now();
+  ticker=setInterval(tick,400);
+  sndStart();
+  setTimeout(nextQ,450);
+}
+
+function tick() {
+  if(paused||over) return;
+  const rem=limitSec-(Date.now()-startMs-totalPausedMs)/1000;
+  if(rem<=0){endGame();return;}
+  const m=Math.floor(rem/60), s=Math.floor(rem%60);
+  const el=document.getElementById('hud-timer');
+  el.textContent=pad(m)+':'+pad(s);
+  el.classList.toggle('urgent',rem<=10);
+}
+
+function pad(n){return String(n).padStart(2,'0')}
+function elapsed(){return(Date.now()-startMs-totalPausedMs)/1000}
+
+function nextQ() {
+  if(over) return;
+  qNum++; cur=nextChar(); tries=0;
+  const ch=mkChoices(cur);
+  document.getElementById('main-char').textContent=cur.c;
+  document.getElementById('hud-qnum').textContent=`문제 ${qNum}`;
+  ['b0','b1','b2'].forEach((id,i)=>{
+    const b=document.getElementById(id);
+    b.textContent=ch[i]; b.dataset.r=ch[i];
+    b.className='cho-btn'; b.disabled=false;
+  });
+}
+
+function answer(btn, r) {
+  if(over||paused) return;
+  tries++;
+  if(r===cur.r) {
+    const p=tries===1?3:tries===2?2:1;
+    pts+=p; answered++;
+    if(tries>1) mistakes.push(cur);
+    btn.classList.add('correct');
+    ['b0','b1','b2'].forEach(id=>document.getElementById(id).disabled=true);
+    // score update
+    const se=document.getElementById('hud-score');
+    se.textContent=pts;
+    se.classList.remove('score-flash'); void se.offsetWidth; se.classList.add('score-flash');
+    // pop indicator
+    showPop(btn, '+'+p+'점');
+    sndOk();
+    setTimeout(()=>{if(!over)nextQ();},420);
+  } else {
+    btn.classList.add('wrong'); btn.disabled=true;
+    sndWrong();
+  }
+}
+
+function showPop(btn, txt) {
+  const r=btn.getBoundingClientRect();
+  const d=document.createElement('div');
+  d.className='pts-pop'; d.textContent=txt;
+  d.style.left=(r.left+r.width/2-24)+'px';
+  d.style.top=(r.top-10)+'px';
+  document.body.appendChild(d);
+  d.addEventListener('animationend',()=>d.remove());
+}
+
+function pauseGame() {
+  if(over||paused) return;
+  paused=true; pausedAt=Date.now();
+  document.getElementById('pause-ov').hidden=false;
+}
+function resumeGame() {
+  if(!paused) return;
+  paused=false; totalPausedMs+=Date.now()-pausedAt;
+  document.getElementById('pause-ov').hidden=true;
+}
+function stopGame() {
+  if(paused){totalPausedMs+=Date.now()-pausedAt;paused=false;}
+  document.getElementById('pause-ov').hidden=true;
+  endGame();
+}
+
+function endGame() {
+  if(over) return;
+  over=true; clearInterval(ticker);
+  if(paused){totalPausedMs+=Date.now()-pausedAt;paused=false;}
+  document.getElementById('pause-ov').hidden=true;
+
+  const sec=elapsed();
+  const minF=Math.max(Math.ceil((sec/60)*10)/10, 0.1);
+  const final=Math.ceil((pts/minF)*10)/10;
+
+  saveHistory({
+    ts:new Date().toISOString(),
+    set:selSet,
+    selMin,
+    sec:Math.floor(sec),
+    pts,
+    answered,
+    final
+  });
+
+  sndEnd();
+  setTimeout(()=>showResult(sec,final), 600);
+}
+
+function showResult(sec, final) {
+  const m=Math.floor(sec/60), s=Math.floor(sec%60);
+  document.getElementById('res-final').textContent=final.toFixed(1);
+  document.getElementById('res-pts').textContent=pts;
+  document.getElementById('res-qs').textContent=answered;
+  document.getElementById('res-time').textContent=m+':'+pad(s);
+  document.getElementById('res-set').textContent=SET_NAMES[selSet]||selSet;
+  document.getElementById('res-emoji').textContent=
+    final>=30?'🏆':final>=15?'🌸':final>=8?'😊':'📚';
+  showScr('result');
+}
+
+// ═══════════════════ HISTORY ═══════════════════
+const HK='hira_hist_v1';
+function saveHistory(e){
+  let h=getHistory(); h.unshift(e);
+  if(h.length>20)h=h.slice(0,20);
+  try{localStorage.setItem(HK,JSON.stringify(h));}catch(_){}
+}
+function getHistory(){
+  try{return JSON.parse(localStorage.getItem(HK))||[];}catch(_){return [];}
+}
+function renderHistory(){
+  const h=getHistory(), wrap=document.getElementById('hist-wrap');
+  if(!h.length){wrap.innerHTML='<div class="hist-empty">아직 연습 기록이 없습니다.</div>';return;}
+  const ul=document.createElement('ul'); ul.className='hist-list';
+  h.forEach(e=>{
+    const d=new Date(e.ts);
+    const ds=`${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const m=Math.floor(e.sec/60), s=e.sec%60;
+    const li=document.createElement('li'); li.className='hist-item';
+    li.innerHTML=`<div><div class="hist-date">${ds}</div><div class="hist-set">${SET_NAMES[e.set]||e.set} · ${m}:${pad(s)}</div></div>`+
+      `<div><div class="hist-score">${e.final.toFixed(1)}</div><div class="hist-detail">${e.pts}점 / ${e.answered}문제</div></div>`;
+    ul.appendChild(li);
+  });
+  wrap.innerHTML=''; wrap.appendChild(ul);
+}
+
+// ═══════════════════ SCREEN ═══════════════════
+function showScr(name){
+  ['start','game','result'].forEach(n=>{
+    document.getElementById('scr-'+n).hidden=(n!==name);
+  });
+  if(name==='start')renderHistory();
+}
+
+// ═══════════════════ EVENTS ═══════════════════
+document.querySelectorAll('.set-btn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.set-btn').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); selSet=b.dataset.set;
+}));
+document.querySelectorAll('.dur-btn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.dur-btn').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); selMin=+b.dataset.min;
+}));
+document.getElementById('start-btn').addEventListener('click',startGame);
+['b0','b1','b2'].forEach(id=>{
+  const b=document.getElementById(id);
+  b.addEventListener('click',()=>answer(b,b.dataset.r));
+});
+document.getElementById('pause-btn').addEventListener('click',pauseGame);
+document.getElementById('stop-btn').addEventListener('click',()=>{
+  if(confirm('게임을 중단하시겠습니까?'))stopGame();
+});
+document.getElementById('resume-btn').addEventListener('click',resumeGame);
+document.getElementById('stop-p-btn').addEventListener('click',stopGame);
+document.getElementById('again-btn').addEventListener('click',()=>showScr('start'));
+
+// ═══════════════════ INIT ═══════════════════
+showScr('start');
+</script>
+</body>
+</html>
