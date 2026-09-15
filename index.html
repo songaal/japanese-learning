@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ひらがな 학습 게임</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -14,7 +14,7 @@
   --gold:#C9A84C;--gray:#9B8773;
   --white:#FFF;--green:#27AE60;
 }
-body{font-family:'Noto Sans KR','맑은 고딕',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden}
+body{font-family:'Noto Sans KR','맑은 고딕',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--cream-d) 1px,transparent 1px);background-size:28px 28px;opacity:.45;pointer-events:none;z-index:0}
 
 .screen{position:relative;z-index:1;min-height:100vh;padding:16px;max-width:580px;margin:0 auto}
@@ -89,6 +89,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
 .cho-btn{flex:1;padding:18px 8px;border:2px solid var(--cream-d);border-radius:10px;background:var(--white);font-size:1.3rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:700;transition:all .15s;box-shadow:0 3px 0 var(--cream-d);color:var(--dark)}
 .cho-btn:hover:not(:disabled){border-color:var(--red);background:#FFF5F5;transform:translateY(-2px);box-shadow:0 5px 0 var(--cream-d)}
 .cho-btn:active:not(:disabled){transform:translateY(1px);box-shadow:0 2px 0 var(--cream-d)}
+.cho-btn:focus{outline:none}
 .cho-btn.wrong{border-color:var(--red-l)!important;background:#FDEDEC!important;color:var(--red-l)!important;box-shadow:0 3px 0 var(--red-d)!important}
 .cho-btn.correct{border-color:var(--green)!important;background:#EAFAF1!important;color:var(--green)!important}
 .cho-btn:disabled{cursor:default}
@@ -332,6 +333,11 @@ function startGame() {
   over=false; paused=false; totalPausedMs=0;
   limitSec=selMin*60;
   showScr('game');
+  document.getElementById('hud-score').textContent='0';
+  document.getElementById('hud-score').classList.remove('score-flash');
+  document.getElementById('hud-timer').textContent=pad(selMin)+':00';
+  document.getElementById('hud-timer').classList.remove('urgent');
+  document.getElementById('hud-qnum').textContent='문제 1';
   startMs=Date.now();
   ticker=setInterval(tick,400);
   sndStart();
@@ -360,7 +366,7 @@ function nextQ() {
   ['b0','b1','b2'].forEach((id,i)=>{
     const b=document.getElementById(id);
     b.textContent=ch[i]; b.dataset.r=ch[i];
-    b.className='cho-btn'; b.disabled=false;
+    b.className='cho-btn'; b.disabled=false; b.blur();
   });
 }
 
@@ -419,7 +425,7 @@ function endGame() {
   if(paused){totalPausedMs+=Date.now()-pausedAt;paused=false;}
   document.getElementById('pause-ov').hidden=true;
 
-  const sec=elapsed();
+  const sec=Math.min(elapsed(), limitSec);
   const minF=Math.max(Math.ceil((sec/60)*10)/10, 0.1);
   const final=Math.ceil((pts/minF)*10)/10;
 
