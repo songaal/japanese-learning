@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ひらがな 학습 게임</title>
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ひらがな">
+<meta name="theme-color" content="#C0392B">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -142,7 +149,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
   <div class="hdr">
     <h1>ひらがな 학습</h1>
     <p>히라가나 오십음도 마스터</p>
-    <p class="version">v1.0.0 · 2026.09.15 16.38</p>
+    <p class="version">v1.0.0 · 2026.09.15 16:38</p>
   </div>
   <div class="divider"><span>❖</span></div>
 
@@ -374,6 +381,7 @@ function mkChoices(correct) {
 
 // ═══════════════════ GAME ═══════════════════
 function startGame() {
+  if(audioCtx){try{audioCtx.close();}catch(_){} audioCtx=null;}
   initPool();
   pts=0; answered=0; qNum=0; tries=0;
   over=false; paused=false; totalPausedMs=0;
@@ -477,12 +485,12 @@ function endGame() {
   const final=Math.ceil((pts/minF)*10)/10;
 
   saveHistory({ts:new Date().toISOString(), set:selSet, selMin, sec:Math.floor(sec), pts, answered, final});
-  sndEnd();
-  setTimeout(()=>showResult(sec, final), 600);
+  setTimeout(()=>showResult(sec, final), 200);
 }
 
 function showResult(sec, final) {
   const m=Math.floor(sec/60), s=Math.floor(sec%60);
+  sndEnd();
   document.getElementById('res-final').textContent=final.toFixed(1);
   document.getElementById('res-pts').textContent=pts;
   document.getElementById('res-qs').textContent=answered;
