@@ -190,7 +190,7 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     <div id="hist-wrap"><div class="hist-empty">아직 연습 기록이 없습니다.</div></div>
   </div>
 
-  <p class="version">v1.1.0 · 2026.09.15 17:18</p>
+  <p class="version">v1.1.1 · 2026.09.15 17:18</p>
 </div>
 
 <!-- ── GAME SCREEN ── -->
@@ -269,7 +269,7 @@ const H50 = [
   {c:'ま',r:'마'},{c:'み',r:'미'},{c:'む',r:'무'},{c:'め',r:'메'},{c:'も',r:'모'},
   {c:'や',r:'야'},{c:'ゆ',r:'유'},{c:'よ',r:'요'},
   {c:'ら',r:'라'},{c:'り',r:'리'},{c:'る',r:'루'},{c:'れ',r:'레'},{c:'ろ',r:'로'},
-  {c:'わ',r:'와'},{c:'を',r:'워'},{c:'ん',r:'응'}
+  {c:'わ',r:'와'},{c:'を',r:'오'},{c:'ん',r:'응'}
 ];
 const HDK = [
   {c:'が',r:'가'},{c:'ぎ',r:'기'},{c:'ぐ',r:'구'},{c:'げ',r:'게'},{c:'ご',r:'고'},
@@ -391,7 +391,7 @@ function vowelOf(r) {
   if ('이키기시지치니히비피미리'.includes(r)) return 'i';
   if ('우쿠구스즈츠누후부푸무루유'.includes(r)) return 'u';
   if ('에케게세제테데네헤베페메레'.includes(r)) return 'e';
-  if ('오코고소조토도노호보포모로워요'.includes(r)) return 'o';
+  if ('오코고소조토도노호보포모로요'.includes(r)) return 'o';
   return 'x';
 }
 
